@@ -72,6 +72,9 @@ class Player:
         compiler = re.compile(r'(?<=Seat )\d+')
         return int(re.search(compiler, info).group())
 
+    def __str__(self):
+        return f"{self.name}, {self.stack}, {self.seat}"
+
 
 with open("hand-samples\\Aaltje II-0.50-1-USD-NoLimitHoldem"
           "-PokerStars-8-6-2017.txt") as file:
@@ -82,8 +85,21 @@ table.name = TextHandle.findTable(tableLog[0])
 
 for info in tableLog:
     players = TextHandle.findPlayers(info)
-    handLog = Hand()
+    hand = Hand()
+    hand.id = TextHandle.findHandId(info)
+    hand.blind = TextHandle.findBlinds(info)
+    hand.date = TextHandle.findDateTime(info)
     for pl in players:
-        handLog.players.append(Player(pl))
-    table.hands.append(handLog)
-print(table)
+        hand.players.append(Player(pl))
+    table.hands.append(hand)
+
+f = open(f"{table.name}.txt", 'a')
+for hand in table.hands:
+    f.write(f"Hand ID: {hand.id}\n")
+    f.write(f"The Blinds: {hand.blind}\n")
+    f.write(f"Date and Time: {hand.date}\n")
+    f.write("Players names, stacks and seats\n")
+    for player in hand.players:
+        f.write(f"\t- {player}\n")
+    f.write("\n")
+f.close()
