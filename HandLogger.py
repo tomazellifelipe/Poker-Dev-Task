@@ -49,6 +49,26 @@ class Table:
 class Hand:
     def __init__(self) -> None:
         self.players = []
+        self.flop = False
+        self.turn = False
+        self.river = False
+        self.showdown = False
+
+    def hasRound(self, n_rounds):
+        if n_rounds == 5:
+            self.flop = True
+            self.turn = True
+            self.river = True
+            self.showdown = True
+        elif n_rounds == 4:
+            self.flop = True
+            self.turn = True
+            self.river = True
+        elif n_rounds == 3:
+            self.flop = True
+            self.turn = True
+        elif n_rounds == 2:
+            self.flop = True
 
 
 class Player:
@@ -56,6 +76,34 @@ class Player:
         self.name = self.Name(info)
         self.stack = self.Stack(info)
         self.seat = self.Seat(info)
+        self.flop = False
+        self.turn = False
+        self.river = False
+        self.showdown = False
+
+    def stayedInGame(self, rounds: list, n_rounds):
+        count = 0
+        token = " ".join(rounds[1::2]).splitlines()
+        if n_rounds == 1:
+            return
+        else:
+            for i in token:
+                if i.find(self.name+':') > -1:
+                    count += 1
+        if count == 5:
+            self.flop = True
+            self.turn = True
+            self.river = True
+            self.showdown = True
+        elif count == 4:
+            self.flop = True
+            self.turn = True
+            self.river = True
+        elif count == 3:
+            self.flop = True
+            self.turn = True
+        elif count == 2:
+            self.flop = True
 
     @staticmethod
     def Name(info: str) -> str:
@@ -84,13 +132,17 @@ table = Table()
 table.name = TextHandle.findTable(tableLog[0])
 
 for info in tableLog:
+    rodadas = info.split('***')[1: -2]
+    numRodadas = int(len(rodadas) / 2)
     players = TextHandle.findPlayers(info)
     hand = Hand()
     hand.id = TextHandle.findHandId(info)
     hand.blind = TextHandle.findBlinds(info)
     hand.date = TextHandle.findDateTime(info)
+    hand.hasRound(numRodadas)
     for pl in players:
         player = Player(pl)
+        player.stayedInGame(rodadas, numRodadas)
         player.foldBeforeFlop = TextHandle.foldedBeforeFlop(info, player.name)
         hand.players.append(player)
     table.hands.append(hand)
@@ -107,5 +159,25 @@ for hand in table.hands:
     for player in hand.players:
         if player.foldBeforeFlop:
             f.write(f"\t- {player.name}\n")
+    if (hand.flop):
+        f.write("Players that played the flop (if any)\n")
+        for player in hand.players:
+            if player.flop:
+                f.write(f"\t- {player.name}\n")
+    if (hand.turn):
+        f.write("Players that played the turn (if any)\n")
+        for player in hand.players:
+            if player.turn:
+                f.write(f"\t- {player.name}\n")
+    if (hand.river):
+        f.write("Players that played the river (if any)\n")
+        for player in hand.players:
+            if player.river:
+                f.write(f"\t- {player.name}\n")
+    if (hand.showdown):
+        f.write("Players that played the showdown (if any)\n")
+        for player in hand.players:
+            if player.showdown:
+                f.write(f"\t- {player.name}\n")
     f.write("\n")
 f.close()
