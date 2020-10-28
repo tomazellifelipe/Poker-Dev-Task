@@ -90,16 +90,22 @@ for info in tableLog:
     hand.blind = TextHandle.findBlinds(info)
     hand.date = TextHandle.findDateTime(info)
     for pl in players:
-        hand.players.append(Player(pl))
+        player = Player(pl)
+        player.foldBeforeFlop = TextHandle.foldedBeforeFlop(info, player.name)
+        hand.players.append(player)
     table.hands.append(hand)
 
 f = open(f"{table.name}.txt", 'a')
 for hand in table.hands:
-    f.write(f"Hand ID: {hand.id}\n")
+    f.write(f"Hand ID: {hand.id[1:]}\n")
     f.write(f"The Blinds: {hand.blind}\n")
     f.write(f"Date and Time: {hand.date}\n")
-    f.write("Players names, stacks and seats\n")
+    f.write("Players names, stacks and seats:\n")
     for player in hand.players:
         f.write(f"\t- {player}\n")
+    f.write("Players that folded preflop (if any)\n")
+    for player in hand.players:
+        if player.foldBeforeFlop:
+            f.write(f"\t- {player.name}\n")
     f.write("\n")
 f.close()
