@@ -13,5 +13,5 @@
  - folded preflop (bool)
  - stack final (float)
 
-~~## TextHandle
- - responsável pelos regex~~
+~~## TextHandle~~
+ ~~- responsável pelos regex~~
