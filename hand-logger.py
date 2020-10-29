@@ -30,6 +30,11 @@ class Hand:
             self.players.append(Player(self.log[i]))
             i += 1
 
+    def __str__(self):
+        return f'Hand ID: {self.id}\n' \
+               f'The Blinds: {self.small}/{self.big}\n' \
+               f'Date and Time: {self.date}\n'
+
 
 class Player():
     def __init__(self, info: str) -> None:
@@ -47,6 +52,9 @@ class Player():
     def playerStack(self):
         self.stack = float(re.search(r'[$][\d.]+', self.info).group()[1:])
 
+    def __str__(self):
+        return f'\t- {self.name}, {self.stack}, {self.seat}\n'
+
 
 def openFile(filePath: str) -> list:
     with open(filePath) as file:
@@ -59,6 +67,18 @@ def splitLinesAndClean(text: str) -> list:
 
 filePath = "hand-samples\\Aaltje II-0.50-1-USD-NoLimitHoldem" \
            "-PokerStars-8-6-2017.txt"
+table = []
 handsLog = openFile(filePath)
-hand = Hand(splitLinesAndClean(handsLog[0]))
-hand.createplayers()
+for log in handsLog:
+    hand = Hand(splitLinesAndClean(log.strip()))
+    hand.createplayers()
+    table.append(hand)
+
+f = open('hand-logs\\sampleLog.txt', 'a')
+for hand in table:
+    f.write(f'{hand}')
+    f.write('Players names, stacks, seats\n')
+    for player in hand.players:
+        f.write(f'{player}')
+    f.write('\n')
+f.close()
